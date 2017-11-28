@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading.Tasks;
+using Peregrine.Ado;
 
 namespace BenchmarkDb
 {
@@ -142,14 +143,23 @@ namespace BenchmarkDb
         {
             using (var connection = _providerFactory.CreateConnection())
             {
+                connection.ConnectionString = _connectionString;
+
+                await connection.OpenAsync();
+
                 using (var command = connection.CreateCommand())
                 {
-                    connection.ConnectionString = _connectionString;
-
-                    await connection.OpenAsync();
-
                     command.CommandText = Program.TestQuery;
-                    command.Prepare();
+
+                    if (command is PeregrineCommand peregrineCommand)
+                    {
+                        // HACK
+                        await peregrineCommand.PrepareAsync();
+                    }
+                    else
+                    {
+                        command.Prepare();
+                    }
 
                     while (Program.IsRunning)
                     {
