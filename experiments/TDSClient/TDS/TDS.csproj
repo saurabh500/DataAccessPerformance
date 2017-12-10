@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="objc\i386\TempPE\" />
+    <Folder Include="objr\i386\TempPE\" />
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+</Project>
