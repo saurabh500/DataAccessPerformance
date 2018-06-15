@@ -102,16 +102,15 @@ namespace BenchmarkDb
 
         public override async Task DoWorkAsync()
         {
+            var connection = _providerFactory.CreateConnection();
+            connection.ConnectionString = _connectionString;
+
+            await connection.OpenAsync();
+
             while (Program.IsRunning)
             {
                 var results = new List<Fortune>();
-
-                using (var connection = _providerFactory.CreateConnection())
                 {
-                    connection.ConnectionString = _connectionString;
-
-                    await connection.OpenAsync();
-
                     using (var command = connection.CreateCommand())
                     {
                         command.CommandText = Program.TestQuery;
@@ -136,6 +135,7 @@ namespace BenchmarkDb
 
                 Program.IncrementCounter();
             }
+            connection.Close();
         }
 
         public override async Task DoWorkAsyncCaching()
