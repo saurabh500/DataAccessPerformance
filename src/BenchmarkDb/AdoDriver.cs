@@ -24,15 +24,15 @@ namespace BenchmarkDb
 
         public override Task DoWorkSync()
         {
+            var connection = _providerFactory.CreateConnection();
+            connection.ConnectionString = _connectionString;
+            connection.Open();
             while (Program.IsRunning)
             {
                 var results = new List<Fortune>();
 
-                using (var connection = _providerFactory.CreateConnection())
+                
                 {
-                    connection.ConnectionString = _connectionString;
-                    connection.Open();
-
                     using (var command = connection.CreateCommand())
                     {
                         command.CommandText = Program.TestQuery;
@@ -57,6 +57,7 @@ namespace BenchmarkDb
 
                 Program.IncrementCounter();
             }
+            connection.Close();
 
             return Task.CompletedTask;
         }
