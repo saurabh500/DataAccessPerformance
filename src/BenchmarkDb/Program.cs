@@ -34,8 +34,7 @@ namespace BenchmarkDb
             {
                 { "ado-npgsql", new AdoDriver(NpgsqlFactory.Instance) },
                 { "ado-mysql", new AdoDriver(MySqlClientFactory.Instance) },
-                { "ado-sqlclient", new AdoDriver(SqlClientFactory.Instance) },
-                { "peregrine", new PeregrineDriver() }
+                { "ado-sqlclient", new AdoDriver(SqlClientFactory.Instance) }
             };
 
         public static async Task<int> Main(string[] args)
@@ -43,7 +42,7 @@ namespace BenchmarkDb
 #if DEBUG
             Console.WriteLine("WARNING! Using DEBUG build.");
 #endif
-            int Help((string option, string value) invalid = default)
+            int Help(string option, string value)
             {
                 Console.WriteLine("Usage: <driver> <connection-string> [threads] [variation] [time]");
                 Console.WriteLine();
@@ -57,9 +56,9 @@ namespace BenchmarkDb
                 Console.WriteLine("  [time]:      The number of seconds to run for (default 10).");
                 Console.WriteLine();
 
-                if (invalid.option != null)
+                if (option != null)
                 {
-                    Console.WriteLine($"  '{invalid.value}' is not a valid value for parameter '{invalid.option}'!");
+                    Console.WriteLine($"  '{value}' is not a valid value for parameter '{option}'!");
                     Console.WriteLine();
                 }
 
@@ -68,21 +67,21 @@ namespace BenchmarkDb
 
             if (args.Length < 3)
             {
-                return Help();
+                return Help(null, null);
             }
 
             var driverName = args[0];
 
             if (!_drivers.TryGetValue(driverName, out var driver))
             {
-                return Help(("driver", driverName));
+                return Help("driver", driverName);
             }
 
             var connectionString = args[1];
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
-                return Help(("connection-string", connectionString));
+                return Help("connection-string", connectionString);
             }
 
             var variationName = args[2];
@@ -91,7 +90,7 @@ namespace BenchmarkDb
 
             if (variation == null)
             {
-                return Help(("variation", variationName));
+                return Help("variation", variationName);
             }
 
             var threadCount = DefaultThreadCount;
@@ -100,13 +99,13 @@ namespace BenchmarkDb
             if (args.Length > 3
                 && !int.TryParse(args[3], out threadCount))
             {
-                return Help(("threads", args[3]));
+                return Help("threads", args[3]);
             }
 
             if (args.Length > 4
                 && !int.TryParse(args[4], out time))
             {
-                return Help(("time", args[4]));
+                return Help("time", args[4]);
             }
 
             driver.Initialize(connectionString, threadCount);
